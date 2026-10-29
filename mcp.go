@@ -99,10 +99,14 @@ func initMcpClient(ctx context.Context, server MCPServerConfig) (*client.Client,
 
 	switch server.Type {
 	case "", "stdio":
+		args := make([]string, len(server.Args))
+		for i, arg := range server.Args {
+			args[i] = os.ExpandEnv(arg)
+		}
 		cli, err = client.NewStdioMCPClient(
 			server.Command,
 			append(os.Environ(), server.Env...),
-			server.Args...,
+			args...,
 		)
 	case "sse":
 		cli, err = client.NewSSEMCPClient(server.URL)
